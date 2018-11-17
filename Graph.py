@@ -10,7 +10,11 @@ class Graph():
       Using the self.edges return a np.array with the index of the 
     vertices that are adjacent of the "vertice_index" of the paramenter.
     """
-    pass
+    adjacents = []
+    for index in len(self.edges):
+      if self.edges[vertice_index][index] == 1:
+        adjacents.append(index)
+    return np.array(adjacents)
 
   def greed(self):
     pass
