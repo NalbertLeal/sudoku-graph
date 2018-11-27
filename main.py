@@ -17,7 +17,7 @@ if '__main__' == __name__:
   gc.set_threshold(0)
 
   #  Read the dataset
-  sudoku_dataset = pd.read_csv('sudoku_medium.csv')
+  sudoku_dataset = pd.read_csv('sudoku_easy.csv')
 
   #  Before start the process we need to create 4 Queue.
   # This Queue going to receive the output from each 
