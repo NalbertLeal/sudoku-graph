@@ -1,7 +1,6 @@
 import time
 
 def test_backtrack(backtrack_queue, graph, tests_finished, tests_runnig):
-  print('backtrack test - tests_finished = ', tests_finished.qsize())
   result = [] # This test return this list
   start = time.time()
 
