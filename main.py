@@ -4,17 +4,17 @@ if '__main__' == __name__:
   import pandas as pd
   import gc
 
-  # modules of this project
+  #  Modules of this project that handle the test in a parallel way
   import parallel_handler.backtrack
   import parallel_handler.greed
   import parallel_handler.ldo
   import parallel_handler.sdo
 
-  # turn off garbage collector to extract maximum performance
+  #  Turn off garbage collector to extract maximum performance
   gc.disable()
   gc.set_threshold(0)
 
-  # read the dataset
+  #  Read the dataset
   sudoku_dataset = pd.read_csv('sudoku_500.csv')
 
   #  Before start the process we need to create 4 Queue.
@@ -26,14 +26,14 @@ if '__main__' == __name__:
   ldo_queue = mp.Queue()
   sdo_queue = mp.Queue()
 
-  # Creating the process to run the tests in parallel
+  #  Creating the process to run the tests in parallel
 
   backtrack_process = mp.Process(target=parallel_handler.backtrack.main, args=(backtrack_queue, sudoku_dataset))
   greed_process = mp.Process(target=parallel_handler.greed.main, args=(greed_queue, sudoku_dataset))
   ldo_process = mp.Process(target=parallel_handler.ldo.main, args=(ldo_queue, sudoku_dataset))
   sdo_process = mp.Process(target=parallel_handler.sdo.main, args=(sdo_queue, sudoku_dataset))
 
-  # Start the process to start the tests in parallel
+  #  Start the process to start the tests in parallel
 
   backtrack_process.start()
   greed_process.start()
@@ -41,7 +41,7 @@ if '__main__' == __name__:
   sdo_process.start()
 
   #  Wait all the results from the process. Just remenber
-  # That the 4 Queue must receive 100 outputs. So below
+  # that the 4 Queue must receive 100 outputs. So below
   # you going to see 4 list compresions that are creating
   # a list with 100 elements.
 
@@ -50,14 +50,14 @@ if '__main__' == __name__:
   ldo_result = [ldo_queue.get() for o in range(0, 100)]
   sdo_result = [sdo_queue.get() for o in range(0, 100)]
 
-  # Close the process
+  #  Close the process
 
   backtrack_process.join()
   greed_process.join()
   ldo_process.join()
   sdo_process.join()
 
-  # We need to clean the results
+  #  We need to clean the results
 
   backtrack_correct = []
   backtrack_answer = []
@@ -111,7 +111,7 @@ if '__main__' == __name__:
       sdo_answer.append(result[1])
       sdo_time.append(result[0])
 
-  # Create a list with the rows of each dataset result
+  #  Create a list with the rows of each dataset result
 
   backtrack_clean = [pd.Series(backtrack_correct, name='correct'), pd.Series(backtrack_answer, name='answer'), pd.Series(backtrack_time, name='time')]  
   greed_clean = [pd.Series(greed_correct, name='correct'), pd.Series(greed_answer, name='answer'), pd.Series(greed_time, name='time')]
@@ -119,14 +119,16 @@ if '__main__' == __name__:
   sdo_clean = [pd.Series(sdo_correct, name='correct'), pd.Series(sdo_answer, name='answer'), pd.Series(sdo_time, name='time')]
 
   #  After that we need to write this results to a Dataset
-  # and then make the pd.Dataset write a ".csv" file
 
   backtrack_dataset = pd.concat(backtrack_clean, axis=1, keys=[s.name for s in backtrack_clean])
   greed_dataset = pd.concat(greed_clean, axis=1, keys=[s.name for s in greed_clean])
   ldo_dataset = pd.concat(ldo_clean, axis=1, keys=[s.name for s in ldo_clean])
   sdo_dataset = pd.concat(sdo_clean, axis=1, keys=[s.name for s in sdo_clean])
 
-  backtrack_dataset.to_csv()
-  greed_dataset.to_csv()
-  ldo_dataset.to_csv()
-  sdo_dataset.to_csv()
+  
+  # Write the pd.Dataset to a ".csv" file
+
+  backtrack_dataset.to_csv('backtrack_dataset')
+  greed_dataset.to_csv('greed_dataset')
+  ldo_dataset.to_csv('ldo_dataset')
+  sdo_dataset.to_csv('sdo_dataset')
