@@ -5,10 +5,10 @@ if '__main__' == __name__:
   import gc
 
   # modules of this project
-  import color_algorithms.backtrack
-  import color_algorithms.greed
-  import color_algorithms.ldo
-  import color_algorithms.sdo
+  import parallel_handler.backtrack
+  import parallel_handler.greed
+  import parallel_handler.ldo
+  import parallel_handler.sdo
 
   # turn off garbage collector to extract maximum performance
   gc.disable()
@@ -28,10 +28,10 @@ if '__main__' == __name__:
 
   # Creating the process to run the tests in parallel
 
-  backtrack_process = mp.Process(target=color_algorithms.backtrack.main, args=(backtrack_queue, sudoku_dataset))
-  greed_process = mp.Process(target=color_algorithms.greed.main, args=(greed_queue, sudoku_dataset))
-  ldo_process = mp.Process(target=color_algorithms.ldo.main, args=(ldo_queue, sudoku_dataset))
-  sdo_process = mp.Process(target=color_algorithms.sdo.main, args=(sdo_queue, sudoku_dataset))
+  backtrack_process = mp.Process(target=parallel_handler.backtrack.main, args=(backtrack_queue, sudoku_dataset))
+  greed_process = mp.Process(target=parallel_handler.greed.main, args=(greed_queue, sudoku_dataset))
+  ldo_process = mp.Process(target=parallel_handler.ldo.main, args=(ldo_queue, sudoku_dataset))
+  sdo_process = mp.Process(target=parallel_handler.sdo.main, args=(sdo_queue, sudoku_dataset))
 
   # Start the process to start the tests in parallel
 
