@@ -1,107 +1,61 @@
 if '__main__' == __name__:
   import multiprocessing as mp
   import numpy as np
-  import pandas as pd  
+  import pandas as pd
   import gc
 
-  from Graph import Graph 
-  import Test
+  # modules of this project
+  import color_algorithms.backtrack
+  import color_algorithms.greed
+  import color_algorithms.ldo
+  import color_algorithms.sdo
 
+  # turn off garbage collector to extract maximum performance
   gc.disable()
   gc.set_threshold(0)
 
-  # create the queue that receive the output from the tests
-  greed_output = mp.Queue()
-  ldo_output = mp.Queue()
-  sdo_output = mp.Queue()
-
-  # before any test we need to read the dataset
-  # the line of code below read the sudoku dataset
+  # read the dataset
   sudoku_dataset = pd.read_csv('sudoku_500.csv')
 
-  # Helper functions (function to write less code)
+  #  Before start the process we need to create 4 Queue.
+  # This Queue going to receive the output from each 
+  # process and then we going to work with this results.
 
-  def tests_loop(function_to_run):
-    """
-      This function receive by parameter the function test to run test
-    inside the loop the repeat 500 times (because we expect each algorithm
-    to run 500 times).
-    """
-    for index in range(0, 500):
-      sudoku_dataset.iloc[index] # get the row with the graph input
-                                 # and expected output
-      graph = Graph() # Create the graph with the input
-      function_to_run(greed_output, graph) # start the test
+  backtrack_queue = mp.Queue()
+  greed_queue = mp.Queue()
+  ldo_queue = mp.Queue()
+  sdo_queue = mp.Queue()
 
-  # Create a function to each algorithm that going to be tested
+  # Creating the process to run the tests in parallel
 
-  def greed_tests(greed_output):
-    """
-      This function start the test of the greed algorithm. 
-    """
-    greed_output = greed_output[0]
-    tests_runnig = 0
-    tests_finished = 0
-    while tests_finished < 500:
-      if tests_runnig < 10:
-        tests_runnig += 1
-        graph = Graph(list(str(sudoku_dataset.iat[0,tests_finished])))
-        test_proccess = mp.Process(target=Test.test_greed, args=(greed_output, graph, tests_finished, tests_runnig))
-        test_proccess.start()
-        # tests_loop(tests.test_greed)
+  backtrack_process = mp.Process(target=color_algorithms.backtrack.main, args=(backtrack_queue, sudoku_dataset))
+  greed_process = mp.Process(target=color_algorithms.greed.main, args=(greed_queue, sudoku_dataset))
+  ldo_process = mp.Process(target=color_algorithms.ldo.main, args=(ldo_queue, sudoku_dataset))
+  sdo_process = mp.Process(target=color_algorithms.sdo.main, args=(sdo_queue, sudoku_dataset))
 
-  def ldo_tests(ldo_output):
-    """
-      This function start the test of the ldo algorithm. 
-    """
-    # tests_loop(tests.test_ldo)
-    ldo_output = ldo_output[0]
-    tests_runnig = 0
-    tests_finished = 0
-    while tests_finished < 500:
-      if tests_runnig < 10:
-        tests_runnig += 1
-        graph = Graph(list(str(sudoku_dataset.iat[0,tests_finished])))
-        test_proccess = mp.Process(target=Test.test_ldo, args=(greed_output, graph, tests_finished,greed_tests_runnig))
-        test_proccess.start()
+  # Start the process to start the tests in parallel
 
-  def sdo_tests(sdo_output):
-    """
-      This function start the test of the sdo algorithm. 
-    """
-    # tests_loop(tests.test_sdo)
-    sdo_output = sdo_output[0]
-    tests_runnig = 0
-    tests_finished = 0
-    while tests_finished < 500:
-      if tests_runnig < 10:
-        tests_runnig += 1
-        graph = Graph(list(str(sudoku_dataset.iat[0,tests_finished])))
-        test_proccess = mp.Process(target=Test.test_sdo, args=(greed_output, graph, tests_finished,tests_runnig))
-        test_proccess.start()
+  backtrack_process.start()
+  greed_process.start()
+  ldo_process.start()
+  sdo_process.start()
 
-  # create the 3 tests process
-  greed_test_process = mp.Process(target=greed_tests, args=([greed_output]))
-  ldo_test_process = mp.Process(target=ldo_tests, args=([ldo_output]))
-  sdo_test_process = mp.Process(target=sdo_tests, args=([sdo_output]))
+  #  Wait all the results from the process. Just remenber
+  # That the 4 Queue must receive 100 outputs. So below
+  # you going to see 4 list compresions that are creating
+  # a list with 100 elements.
 
-  # start the 3 tests to run at the same time
-  greed_test_process.start()
-  ldo_test_process.start()
-  sdo_test_process.start()
+  backtrack_result = [backtrack_queue.get() for o in range(0, 100)]
+  greed_result = [greed_queue.get() for o in range(0, 100)]
+  ldo_result = [ldo_queue.get() for o in range(0, 100)]
+  sdo_result = [sdo_queue.get() for o in range(0, 100)]
 
-  greed_results = [greed_output.get() for p in processes]
-  ldo_results = [ldo_output.get() for p in processes]
-  sdo_results = [sdo_output.get() for p in processes]
+  backtrack_process.join()
+  greed_process.join()
+  ldo_process.join()
+  sdo_process.join()
 
-  
+  #  After that we need to write this results to a Dataset
+  # and then make the pd.Dataset write a ".csv" file
 
-  # wait all the responses to stop the process
-  # while True:
-  #   if len(greed_output) == 500:
-  #     if len(ldo_output) == 500 and len(sdo_output) == 500:
-  #       #   if all the tests responses as received then stop the 
-  #       # 3 main tests process
-  #       greed_test_process.join()
-  #       ldo_test_process.join()
-  #       sdo_test_process.join()
+  print(backtrack_result)

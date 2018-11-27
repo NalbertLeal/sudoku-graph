@@ -1,3 +1,4 @@
+import numpy as np
 from copy import copy
 
 class Graph():
@@ -99,7 +100,7 @@ class Graph():
     def vertice_saturation(self, vertice, local_vertices):
         return len(self.adjacents_colors(vertice, local_vertices))
 
-    def greed(self, queue):
+    def greed(self):
         """
           Algorithm to color a graph in a greed way (almost brute force),
         in other words, this algorithm color te vertice with the fisrt 
@@ -120,9 +121,10 @@ class Graph():
                     break
                 else:
                     if expected_color == max_color_number:
-                        raise Exception('The vertice ' + str(vertice) + ' need more than 9 colors')
+                        return 'The vertice ' + str(vertice) + ' need more than 9 colors'
+                        #raise Exception('The vertice ' + str(vertice) + ' need more than 9 colors')
                     expected_color += 1
-        queue.append(colors)
+        return colors
         
     def ldo(self, queue):
         vertices_number = self.vertices.size
@@ -154,18 +156,19 @@ class Graph():
             else:
                 #  if don't have an color to this element, then append the result to the queue and then
                 # raise an Exception to don't continue to loop over this element.
-                queue.append(colors)
-                raise Exception('The LDO is locked in element ' + str(max_vertice))
+                return 'The LDO is locked in element ' + str(max_vertice)
+                # raise Exception('The LDO is locked in element ' + str(max_vertice))
                     
             if colors[max_vertice] != '0':
                 colored_vertices += 1
             if colors_numbers < expected_color:
                 colors_numbers = expected_color
             if colors_numbers == 10:
-                raise Exception('Need more than 9 colors')
-        queue.append(colors)
+                return 'Need more than 9 colors'
+                # raise Exception('Need more than 9 colors')
+        return colors
     
-    def sdo(self, queue):
+    def sdo(self):
         vertices_number = self.vertices.size
         colors = copy(self.vertices)
         colors_numbers = 1
@@ -175,7 +178,6 @@ class Graph():
             most_satureted_vertice = -1
             for vertice in range(0, vertices_number):
                 vertice_color = colors[vertice]
-#                 print(bigest_saturation, ' ', most_satureted_vertice)
                 if vertice_color == '0': # vertice doesn't have color
                     vertice_saturation = self.vertice_saturation(vertice, colors)
                     if bigest_saturation < vertice_saturation:
@@ -193,89 +195,180 @@ class Graph():
             # colore o max_vertice com a menor cor disponivel
             to_color = [x for x in self.acceptable_colors if x not in most_sat_vertice_adj_colors]
             if len(to_color) > 0:
-#                 print(most_satureted_vertice, ' ', to_color)
                 colors[most_satureted_vertice] = str(to_color[0])
             else:
                 #  if don't have an color to this element, then append the result to the queue and then
                 # raise an Exception to don't continue to loop over this element.
-                queue.append(colors)
-                raise Exception('The SDO is locked in element ' + str(most_satureted_vertice))
+                return 'The SDO is locked in element ' + str(most_satureted_vertice)
+                # raise Exception('The SDO is locked in element ' + str(most_satureted_vertice))
             
             if colors[most_satureted_vertice] != '0':
                 colored_vertices += 1
             if colors_numbers < expected_color:
                 colors_numbers = expected_color
             if colors_numbers == 10:
-                raise Exception('Need more than 9 colors')
-        queue.append(colors)
-        
-    def full_saturated(self, saturation):
-        for element in saturation:
-            if element != -1:
-                return True
-        return False
-    
-    def verify_color(self, vertice_biggest_saturation, local_vertices, cor):
-        for vertice in range(0, local_vertices.size):
-            if self.edges[vertice_biggest_saturation][vertice] == 1 and local_vertices[vertice] == cor:
-                return False
+                return 'Need more than 9 colors'
+                # raise Exception('Need more than 9 colors')
+        return colors
+
+    def vertice_unssigned(self, row, col, vertices_colors):
+        for i in range(0, len(vertices_colors)):
+            for j in range(0, len(vertices_colors)):
+                if str(vertices_colors[i][j]) == '0':
+                    row[0] = i
+                    col[0] = j
+                    return False
         return True
-    
-    def get_bigest_saturation(self, saturation, local_vertices):
-        count = 0
-        temporary_count = 0
-        after_loop = 0
-        for i in range(0, local_vertices.size):
-            if saturation[i] != -1 or local_vertices[i] == '0':
-                temporary_count = 0
-                for j in range(0, local_vertices.size):
-                    if self.edges[i][j] == 1 and local_vertices[j] != '0':
-                        temporary_count += 1
-                if after_loop < temporary_count:
-                    after = temporary_count
-                    count = i
-        saturation[count] = -1
-        return count
-    
-    def __dsatur_backtrack(self, local_vertices, vertice_index, saturation):
-        print(vertice_index)
-        if not self.full_saturated(saturation):
-            return True
-        
-        vertice_biggest_saturation = self.get_bigest_saturation(saturation, local_vertices)
-        
-        if local_vertices[vertice_biggest_saturation]:
-            saturation[vertice_biggest_saturation] = -1
-            if self.__dsatur_backtrack(local_vertices, vertice_index + 1, saturation):
-                return True
-            else:
+
+    def is_safe(self, color, row, col, vertices_colors):
+        for i in range(0, len(self.acceptable_colors)):
+            if vertices_colors[row][i] == str(color):
                 return False
+        # try:
+        for i in range(0, len(self.acceptable_colors)):
+            if vertices_colors[i][col] == str(color):
+                return False
+
+        row_start = int(row/3)*3
+        col_start = int(col/3)*3
+        for i in range(row_start, row_start+3):
+            for j in range(col_start, col_start+3):
+                if vertices_colors[i][j] == str(color):
+                    return False
+        return True
         
-        for cor in self.acceptable_colors:
-            if self.verify_color(vertice_biggest_saturation, local_vertices, cor):
-                if local_vertices[vertice_biggest_saturation] == '0':
-                    local_vertices[vertice_biggest_saturation] = cor
-                    saturation[vertice_biggest_saturation] = -1
-                if self.__dsatur_backtrack(local_vertices, vertice_index + 1, saturation):
+        # except Exception as e:
+        #     print(e)
+
+    def __backtrack(self, vertices_colors):
+        row = [0]
+        col = [0]
+        if self.vertice_unssigned(row, col, vertices_colors):
+            return True
+        row = row[0]
+        col = col[0]
+        for color in self.acceptable_colors:
+            if self.is_safe(color, row, col, vertices_colors):
+                vertices_colors[row][col] = str(color)
+                if self.__backtrack(vertices_colors):
                     return True
-                local_vertices[vertice_biggest_saturation] = 0
-        
-        saturation[vertice_biggest_saturation] = 0
+                vertices_colors[row][col] = '0'
         return False
+
+    def backtrack(self):
+        temporary_vertices_list = []
+        element_count = 0
+        for i in range(0,9):
+            temporary_vertices_list.append([])
+            for j in range(0,9):
+                temporary_vertices_list[i].append(self.vertices[element_count])
+                element_count += 1
+        vertices_colors = temporary_vertices_list
+
+        if self.__backtrack(vertices_colors):
+            return vertices_colors
+        else:
+            return "Backtrack failed"
+
+    # def isColorSafe1(self, vertice_index, color, vertices_colors):
+    #     adjacents_colors = self.adjacents_colors(vertice_index, vertices_colors)
+    #     if color in adjacents_colors:
+    #          return False
+    #     else:
+    #         return True
+
+    # def __backtrack1(self, vertices_colors, vertice_index):
+    #     if vertice_index == vertices_colors.size:
+    #         return True
+    #     vertice_color = vertices_colors[vertice_index]
+    #     for color in self.acceptable_colors:
+    #         if self.isColorSafe(vertice_index, color, vertices_colors):
+    #             vertices_colors[vertice_index] = color
+    #             if self.__backtrack(vertices_colors, vertice_index + 1):
+    #                 return True
+    #             vertices_colors[vertice_index] = '0'
+                    
+    # def backtrack1(self):
+    #     vertices_colors = copy(self.vertices)
+    #     if self.__backtrack(vertices_colors, 0):
+    #         return vertices_colors
+    #     else:
+    #         return "Backtrack failed"
+    #         # raise Exception("Backtrack failed")
+
+
+
+
+
+
+
+    # def full_saturated(self, saturation):
+    #     for element in saturation:
+    #         if element != -1:
+    #             return True
+    #     return False
+    
+    # def verify_color(self, vertice_biggest_saturation, local_vertices, cor):
+    #     for vertice in range(0, local_vertices.size):
+    #         if self.edges[vertice_biggest_saturation][vertice] == 1 and local_vertices[vertice] == cor:
+    #             return False
+    #     return True
+    
+    # def get_bigest_saturation(self, saturation, local_vertices):
+    #     count = 0
+    #     temporary_count = 0
+    #     after_loop = 0
+    #     for i in range(0, local_vertices.size):
+    #         if saturation[i] != -1 or local_vertices[i] == '0':
+    #             temporary_count = 0
+    #             for j in range(0, local_vertices.size):
+    #                 if self.edges[i][j] == 1 and local_vertices[j] != '0':
+    #                     temporary_count += 1
+    #             if after_loop < temporary_count:
+    #                 after = temporary_count
+    #                 count = i
+    #     saturation[count] = -1
+    #     return count
+    
+    # def __dsatur_backtrack(self, local_vertices, vertice_index, saturation):
+    #     print(vertice_index)
+    #     if not self.full_saturated(saturation):
+    #         return True
         
-    def dsatur_backtrack(self, queue):
-        local_vertices = self.vertices
+    #     vertice_biggest_saturation = self.get_bigest_saturation(saturation, local_vertices)
         
-        # create the saturation array
-        saturation = np.zeros((local_vertices.size,), dtype=np.int)
-        for index in range(0, local_vertices.size):
-            if not local_vertices[index] == '0': # has color
-                saturation[index] = 0
-            else:
-                saturation[index] = -1
+    #     if local_vertices[vertice_biggest_saturation]:
+    #         saturation[vertice_biggest_saturation] = -1
+    #         if self.__dsatur_backtrack(local_vertices, vertice_index + 1, saturation):
+    #             return True
+    #         else:
+    #             return False
+        
+    #     for cor in self.acceptable_colors:
+    #         if self.verify_color(vertice_biggest_saturation, local_vertices, cor):
+    #             if local_vertices[vertice_biggest_saturation] == '0':
+    #                 local_vertices[vertice_biggest_saturation] = cor
+    #                 saturation[vertice_biggest_saturation] = -1
+    #             if self.__dsatur_backtrack(local_vertices, vertice_index + 1, saturation):
+    #                 return True
+    #             local_vertices[vertice_biggest_saturation] = 0
+        
+    #     saturation[vertice_biggest_saturation] = 0
+    #     return False
+        
+    # def dsatur_backtrack(self, queue):
+    #     local_vertices = self.vertices
+        
+    #     # create the saturation array
+    #     saturation = np.zeros((local_vertices.size,), dtype=np.int)
+    #     for index in range(0, local_vertices.size):
+    #         if not local_vertices[index] == '0': # has color
+    #             saturation[index] = 0
+    #         else:
+    #             saturation[index] = -1
             
         
-        if self.__dsatur_backtrack(local_vertices, 0, saturation):
-            queue.append(local_vertices)
-        else:
-            raise Exception('The algorithm has stoped.')
+    #     if self.__dsatur_backtrack(local_vertices, 0, saturation):
+    #         queue.append(local_vertices)
+    #     else:
+    #         raise Exception('The algorithm has stoped.')
