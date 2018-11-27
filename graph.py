@@ -1,5 +1,5 @@
 import numpy as np
-from copy import copy
+from copy import copy 
 
 class Graph():
     def __init__(self, vertices_list=[]):
