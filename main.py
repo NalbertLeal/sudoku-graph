@@ -17,7 +17,7 @@ if '__main__' == __name__:
   gc.set_threshold(0)
 
   #  Read the dataset
-  sudoku_dataset = pd.read_csv('sudoku_500.csv')
+  sudoku_dataset = pd.read_csv('sudoku_high.csv')
 
   #  Before start the process we need to create 4 Queue.
   # This Queue going to receive the output from each 
@@ -47,10 +47,10 @@ if '__main__' == __name__:
   # you going to see 4 list compresions that are creating
   # a list with 100 elements.
 
-  backtrack_result = [backtrack_queue.get() for o in range(0, 100)]
-  greed_result = [greed_queue.get() for o in range(0, 100)]
-  ldo_result = [ldo_queue.get() for o in range(0, 100)]
-  sdo_result = [sdo_queue.get() for o in range(0, 100)]
+  backtrack_result = [backtrack_queue.get() for o in range(0, 1000000)]
+  greed_result = [greed_queue.get() for o in range(0, 1000000)]
+  ldo_result = [ldo_queue.get() for o in range(0, 1000000)]
+  sdo_result = [sdo_queue.get() for o in range(0, 1000000)]
 
   #  Close the process
 
