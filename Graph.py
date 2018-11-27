@@ -126,7 +126,7 @@ class Graph():
                     expected_color += 1
         return colors
         
-    def ldo(self, queue):
+    def ldo(self):
         vertices_number = self.vertices.size
         colors = copy(self.vertices)
         colors_numbers = 1

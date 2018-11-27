@@ -10,6 +10,8 @@ if '__main__' == __name__:
   import parallel_handler.ldo
   import parallel_handler.sdo
 
+  import util.list_utils
+
   #  Turn off garbage collector to extract maximum performance
   gc.disable()
   gc.set_threshold(0)
@@ -64,12 +66,15 @@ if '__main__' == __name__:
   backtrack_time = []
   for result in backtrack_result:
     if type(result[1]) == type('str'):
+      # result is an error
       backtrack_correct.append(False)
       backtrack_answer.append(result[1])
       backtrack_time.append(result[0])
     else:
+      # result is the sudoku answer
+      string_of_result =  util.list_utils.list_to_str(result[1]) # convert the list of the result to string 
       backtrack_correct.append(True)
-      backtrack_answer.append(result[1])
+      backtrack_answer.append(string_of_result)
       backtrack_time.append(result[0])
 
   greed_correct = []
@@ -77,12 +82,15 @@ if '__main__' == __name__:
   greed_time = []
   for result in greed_result:
     if type(result[1]) == type('str'):
+      # result is an error
       greed_correct.append(False)
-      greed_answer.append(result[1])
+      greed_answer.append(''.join(result[1]))
       greed_time.append(result[0])
     else:
+      # result is the sudoku answer
+      string_of_result = util.list_utils.list_to_str(result[1]) # convert the list of the result to string 
       greed_correct.append(True)
-      greed_answer.append(result[1])
+      greed_answer.append(string_of_result)
       greed_time.append(result[0])
 
   ldo_correct = []
@@ -90,12 +98,15 @@ if '__main__' == __name__:
   ldo_time = []
   for result in ldo_result:
     if type(result[1]) == type('str'):
+      # result is an error
       ldo_correct.append(False)
       ldo_answer.append(result[1])
       ldo_time.append(result[0])
     else:
+      # result is the sudoku answer
+      string_of_result = util.list_utils.list_to_str(result[1]) # convert the list of the result to string 
       ldo_correct.append(True)
-      ldo_answer.append(result[1])
+      ldo_answer.append(string_of_result)
       ldo_time.append(result[0])
 
   sdo_correct = []
@@ -103,12 +114,15 @@ if '__main__' == __name__:
   sdo_time = []
   for result in sdo_result:
     if type(result[1]) == type('str'):
+      # result is an error
       sdo_correct.append(False)
       sdo_answer.append(result[1])
       sdo_time.append(result[0])
     else:
+      # result is the sudoku answer
+      string_of_result = util.list_utils.list_to_str(result[1]) # convert the list of the result to string 
       sdo_correct.append(True)
-      sdo_answer.append(result[1])
+      sdo_answer.append(string_of_result)
       sdo_time.append(result[0])
 
   #  Create a list with the rows of each dataset result
@@ -128,7 +142,7 @@ if '__main__' == __name__:
   
   # Write the pd.Dataset to a ".csv" file
 
-  backtrack_dataset.to_csv('backtrack_dataset')
-  greed_dataset.to_csv('greed_dataset')
-  ldo_dataset.to_csv('ldo_dataset')
-  sdo_dataset.to_csv('sdo_dataset')
+  backtrack_dataset.to_csv('backtrack_dataset', sep=';')
+  greed_dataset.to_csv('greed_dataset', sep=';')
+  ldo_dataset.to_csv('ldo_dataset', sep=';')
+  sdo_dataset.to_csv('sdo_dataset', sep=';')
