@@ -126,4 +126,7 @@ if '__main__' == __name__:
   ldo_dataset = pd.concat(ldo_clean, axis=1, keys=[s.name for s in ldo_clean])
   sdo_dataset = pd.concat(sdo_clean, axis=1, keys=[s.name for s in sdo_clean])
 
-  print(greed_dataset)
+  backtrack_dataset.to_csv()
+  greed_dataset.to_csv()
+  ldo_dataset.to_csv()
+  sdo_dataset.to_csv()
