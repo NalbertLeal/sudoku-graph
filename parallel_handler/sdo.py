@@ -12,7 +12,7 @@ def main(sdo_queue, sudoku_dataset):
   tests_finished = mp.Queue()
   tests_running = mp.Queue()
   process_list = []
-  while tests_finished.qsize() < 1000000: # While don't exists 100 test finished run more tests
+  while tests_finished.qsize() < len(sudoku_dataset): # While don't exists 100 test finished run more tests
     if tests_running.qsize() < 20: # Must have 10 tests running at the same time
       tests_running.put(True) # Another test going to be initiated, so increment the count variable
       sudoku_input_str = str(sudoku_dataset.iat[number_of_next_row,0]) # The sudoku row with the actual input

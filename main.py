@@ -47,10 +47,10 @@ if '__main__' == __name__:
   # you going to see 4 list compresions that are creating
   # a list with 100 elements.
 
-  backtrack_result = [backtrack_queue.get() for o in range(0, 1000000)]
-  greed_result = [greed_queue.get() for o in range(0, 1000000)]
-  ldo_result = [ldo_queue.get() for o in range(0, 1000000)]
-  sdo_result = [sdo_queue.get() for o in range(0, 1000000)]
+  backtrack_result = [backtrack_queue.get() for o in range(0, len(sudoku_dataset))]
+  greed_result = [greed_queue.get() for o in range(0, len(sudoku_dataset))]
+  ldo_result = [ldo_queue.get() for o in range(0, len(sudoku_dataset))]
+  sdo_result = [sdo_queue.get() for o in range(0, len(sudoku_dataset))]
 
   #  Close the process
 
@@ -142,7 +142,7 @@ if '__main__' == __name__:
   
   # Write the pd.Dataset to a ".csv" file
 
-  backtrack_dataset.to_csv('backtrack_dataset', sep=';')
-  greed_dataset.to_csv('greed_dataset', sep=';')
-  ldo_dataset.to_csv('ldo_dataset', sep=';')
-  sdo_dataset.to_csv('sdo_dataset', sep=';')
+  backtrack_dataset.to_csv('backtrack_dataset_easy', sep=';')
+  greed_dataset.to_csv('greed_dataset_easy', sep=';')
+  ldo_dataset.to_csv('ldo_dataset_easy', sep=';')
+  sdo_dataset.to_csv('sdo_dataset_easy', sep=';')
