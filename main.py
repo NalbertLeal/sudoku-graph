@@ -47,10 +47,10 @@ if '__main__' == __name__:
   # you going to see 4 list compresions that are creating
   # a list with 100 elements.
 
-  backtrack_result = [backtrack_queue.get() for o in range(0, 1000000)]
-  greed_result = [greed_queue.get() for o in range(0, 1000000)]
-  ldo_result = [ldo_queue.get() for o in range(0, 1000000)]
-  sdo_result = [sdo_queue.get() for o in range(0, 1000000)]
+  backtrack_result = [backtrack_queue.get() for o in range(0, len(sudoku_dataset))]
+  greed_result = [greed_queue.get() for o in range(0, len(sudoku_dataset))]
+  ldo_result = [ldo_queue.get() for o in range(0, len(sudoku_dataset))]
+  sdo_result = [sdo_queue.get() for o in range(0, len(sudoku_dataset))]
 
   #  Close the process
 
